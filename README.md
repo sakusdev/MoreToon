@@ -35,6 +35,18 @@ After Unity imports the custom lilToon containers, select:
 
 The first prototype is intentionally limited to **Opaque** while the lighting model is being validated.
 
+## Continuous integration
+
+GitHub Actions runs the Unity EditMode test suite on **Unity 2022.3.22f1**. The shader test imports the MoreToon `.lilcontainer` assets, verifies the generated shaders exist, and fails when Unity's shader compiler reports an error.
+
+Required repository secrets for GameCI Personal activation:
+
+- `UNITY_LICENSE`
+- `UNITY_EMAIL`
+- `UNITY_PASSWORD`
+
+The workflow uploads the Unity Test Runner artifacts on every run, including failed runs.
+
 ## Upstream
 
 MoreToon is based on lilToon and is not an official lilToon project.

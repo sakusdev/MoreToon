@@ -1,0 +1,9 @@
+        //----------------------------------------------------------------------------------------------------------------------
+        // MoreToon
+        [Toggle] _MoreToonEnabled ("[MoreToon] Enable", Float) = 1
+        _MoreToonStrength ("[MoreToon] Strength", Range(0, 1)) = 1
+        _MoreToonShadowSteps ("[MoreToon] Shadow Steps", Range(2, 8)) = 2
+        _MoreToonShadowSharpness ("[MoreToon] Shadow Quantization Strength", Range(0, 1)) = 1
+        _MoreToonLightDirectionSteps ("[MoreToon] Light Direction Steps (0 = Off)", Range(0, 16)) = 0
+        _MoreToonLightSteps ("[MoreToon] Diffuse Light Steps", Range(2, 8)) = 3
+        _MoreToonMinLight ("[MoreToon] Minimum Light", Range(0, 1)) = 0.15

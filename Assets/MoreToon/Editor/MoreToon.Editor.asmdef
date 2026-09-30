@@ -1,0 +1,9 @@
+{
+  "name": "MoreToon.Editor",
+  "references": [
+    "lilToon.Editor"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ]
+}

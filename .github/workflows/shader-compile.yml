@@ -1,0 +1,85 @@
+name: Unity Shader Compile
+
+on:
+  push:
+    branches:
+      - master
+      - "dev/**"
+    paths:
+      - "Assets/**"
+      - "Packages/**"
+      - "ProjectSettings/**"
+      - ".github/workflows/shader-compile.yml"
+  pull_request:
+    paths:
+      - "Assets/**"
+      - "Packages/**"
+      - "ProjectSettings/**"
+      - ".github/workflows/shader-compile.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: shader-compile-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  shader-compile:
+    name: Unity 2022.3.22f1 / EditMode
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate Unity activation secrets
+        shell: bash
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        run: |
+          if [[ -n "$UNITY_LICENSE" ]]; then
+            echo "Unity license file secret is configured."
+            exit 0
+          fi
+
+          if [[ -n "$UNITY_EMAIL" && -n "$UNITY_PASSWORD" ]]; then
+            echo "Unity account credentials are configured."
+            exit 0
+          fi
+
+          echo "::error::Unity activation is not configured. Add UNITY_LICENSE, or add both UNITY_EMAIL and UNITY_PASSWORD as repository Actions secrets."
+          exit 1
+
+      - name: Cache Unity Library
+        uses: actions/cache@v4
+        with:
+          path: Library
+          key: unity-library-2022.3.22f1-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
+          restore-keys: |
+            unity-library-2022.3.22f1-
+
+      - name: Run shader compile tests
+        id: tests
+        uses: game-ci/unity-test-runner@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          projectPath: .
+          unityVersion: 2022.3.22f1
+          testMode: editmode
+          artifactsPath: artifacts
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
+          checkName: MoreToon Shader Compile
+
+      - name: Upload test results
+        if: always() && steps.tests.outcome != 'skipped'
+        uses: actions/upload-artifact@v4
+        with:
+          name: moretoon-shader-test-results
+          path: ${{ steps.tests.outputs.artifactsPath }}
+          if-no-files-found: warn
+          retention-days: 7
